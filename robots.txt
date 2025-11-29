@@ -1,0 +1,59 @@
+# ===============================================================
+# Robots.txt for drawpix.space
+# ===============================================================
+# Author: Sliz
+# Created: 2025-11-29
+# Information: Robots.txt file for drawpix.space
+# ===============================================================
+
+# -----------------------------
+# General rule for all bots
+# -----------------------------
+User-agent: *
+Allow: /
+
+# -----------------------------
+# Sitemap and Host
+# -----------------------------
+Sitemap: https://drawpix.space/sitemap.xml
+Host: drawpix.space
+
+# -----------------------------
+# Rules for Googlebot
+# -----------------------------
+User-agent: Googlebot
+Allow: /
+
+# -----------------------------
+# Rules for Bingbot
+# -----------------------------
+User-agent: Bingbot
+Allow: /
+
+# -----------------------------
+# Rules for Yandex
+# -----------------------------
+User-agent: Yandex
+Allow: /
+Host: fhai.pp.ua
+
+# -----------------------------
+# Rules for Slurp (Yahoo)
+# -----------------------------
+User-agent: Slurp
+Allow: /
+
+# -------------------------
+# BKBB - Safe site system
+# -------------------------
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
