@@ -615,18 +615,18 @@ async function loadPixelData() {
         }
 
 async function applyColor() {
-    if (!selectedPixel) return;
-    
+    if (!selectedPixel) {
+        showNotification('No pixel selected!');
+        return;
+    }
+
     const color = document.getElementById('customColor').value;
     const pixelKey = `${selectedPixel.x}-${selectedPixel.y}`;
-    
-    console.log('[DEBUG] Selected pixel:', selectedPixel, 'Color:', color);
 
     closeColorPicker();
     showVideo();
 
     try {
-        console.log('[DEBUG] Sending POST request to worker...');
         const response = await fetch(`${WORKER_URL}/pixel`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -637,9 +637,8 @@ async function applyColor() {
             })
         });
 
-        console.log('[DEBUG] Response status:', response.status);
         const result = await response.json();
-        console.log('[DEBUG] Response JSON:', result);
+        console.log('Server logs:', result.logs);
 
         if (result.success) {
             pixelData[pixelKey] = color;
@@ -654,16 +653,16 @@ async function applyColor() {
                 PIXEL_SIZE
             );
         } else {
-            console.warn('[DEBUG] Save failed:', result.message);
             showNotification(result.message || 'Error save');
         }
     } catch (e) {
-        console.error('[DEBUG] Network error:', e);
+        console.error(e);
         showNotification('Error connection');
     }
 
     selectedPixel = null;
 }
+
         function showVideo() {
             const overlay = document.getElementById('videoOverlay');
             const video = document.getElementById('adVideo');
