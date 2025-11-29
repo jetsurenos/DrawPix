@@ -344,7 +344,6 @@
 
     <script>
         const WORKER_URL = 'https://pix.markd-voznyuk.workers.dev';
-        const AUTH_CODE = 'px_7k9mQ2vL8nR4wX6pT3jH5sY1cF0dZ9bN';
         const CANVAS_SIZE = 800;
         const PIXEL_SIZE = 5;
         const GRID_SIZE = CANVAS_SIZE / PIXEL_SIZE;
@@ -392,21 +391,19 @@
             });
         }
 
-        async function loadPixelData() {
-            try {
-                const response = await fetch(`${WORKER_URL}/pixels`, {
-                    headers: {
-                        'X-Auth-Code': AUTH_CODE
-                    }
-                });
-                pixelData = await response.json();
-                coloredPixels = Object.keys(pixelData).length;
-                updateStats();
-                drawCanvas();
-            } catch (e) {
-                showNotification('Error connection to server');
-            }
-        }
+async function loadPixelData() {
+    try {
+        const response = await fetch(`${WORKER_URL}/pixels`);
+        const result = await response.json();
+        pixelData = result.data;
+        console.log('Server logs:', result.logs);
+        coloredPixels = Object.keys(pixelData).length;
+        updateStats();
+        drawCanvas();
+    } catch (e) {
+        showNotification('Error connection to server');
+    }
+}
 
         function setupCanvas() {
             ctx.fillStyle = '#f5f5f5';
@@ -617,52 +614,50 @@
             selectedPixel = null;
         }
 
-        async function applyColor() {
-            if (!selectedPixel) return;
+async function applyColor() {
+    if (!selectedPixel) return;
+    
+    const color = document.getElementById('customColor').value;
+    const pixelKey = `${selectedPixel.x}-${selectedPixel.y}`;
+    
+    closeColorPicker();
+    showVideo();
+    
+    try {
+        const response = await fetch(`${WORKER_URL}/pixel`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                x: selectedPixel.x,
+                y: selectedPixel.y,
+                color: color
+            })
+        });
+        
+        const result = await response.json();
+        console.log('Server logs:', result.logs);
+
+        if (result.success) {
+            pixelData[pixelKey] = color;
+            coloredPixels++;
+            updateStats();
             
-            const color = document.getElementById('customColor').value;
-            const pixelKey = `${selectedPixel.x}-${selectedPixel.y}`;
-            
-            closeColorPicker();
-            showVideo();
-            
-            try {
-                const response = await fetch(`${WORKER_URL}/pixel`, {
-                    method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'X-Auth-Code': AUTH_CODE
-                    },
-                    body: JSON.stringify({
-                        x: selectedPixel.x,
-                        y: selectedPixel.y,
-                        color: color
-                    })
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    pixelData[pixelKey] = color;
-                    coloredPixels++;
-                    updateStats();
-                    
-                    ctx.fillStyle = color;
-                    ctx.fillRect(
-                        selectedPixel.x * PIXEL_SIZE,
-                        selectedPixel.y * PIXEL_SIZE,
-                        PIXEL_SIZE,
-                        PIXEL_SIZE
-                    );
-                } else {
-                    showNotification(result.message || 'Error save');
-                }
-            } catch (e) {
-                showNotification('Error connection');
-            }
-            
-            selectedPixel = null;
+            ctx.fillStyle = color;
+            ctx.fillRect(
+                selectedPixel.x * PIXEL_SIZE,
+                selectedPixel.y * PIXEL_SIZE,
+                PIXEL_SIZE,
+                PIXEL_SIZE
+            );
+        } else {
+            showNotification(result.message || 'Error save');
         }
+    } catch (e) {
+        showNotification('Error connection');
+    }
+    
+    selectedPixel = null;
+}
 
         function showVideo() {
             const overlay = document.getElementById('videoOverlay');
