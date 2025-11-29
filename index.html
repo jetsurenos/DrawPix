@@ -297,8 +297,8 @@
     </div>
 
     <div class="stats">
-        <span id="statsText">Loading...</span>
-    </div>
+    <span id="statsText">© 2025 Sliz®</span>
+</div>
 
     <div class="zoom-controls">
         <button class="zoom-btn" onclick="zoomIn()" title="Zoom in">+</button>
@@ -362,13 +362,15 @@
         let totalPixels = GRID_SIZE * GRID_SIZE;
         let coloredPixels = 0;
 
-        let scale = 1;
+        let scale = 0.7;
         let translateX = 0;
         let translateY = 0;
         let isDragging = false;
         let startX = 0;
         let startY = 0;
         let lastTouchDistance = 0;
+        let canPaint = false;
+        let holdTimer = null;
 
         function init() {
             createColorOptions();
@@ -398,7 +400,6 @@ async function loadPixelData() {
         pixelData = result.data;
         console.log('Server logs:', result.logs);
         coloredPixels = Object.keys(pixelData).length;
-        updateStats();
         drawCanvas();
     } catch (e) {
         showNotification('Error connection to server');
@@ -504,23 +505,26 @@ async function loadPixelData() {
         }
 
         function handleTouchStart(e) {
-            if (e.touches.length === 1) {
-                const touch = e.touches[0];
-                isDragging = true;
-                startX = touch.clientX - translateX;
-                startY = touch.clientY - translateY;
-                container.classList.add('grabbing');
-            } else if (e.touches.length === 2) {
-                isDragging = false;
-                container.classList.remove('grabbing');
-                const dx = e.touches[0].clientX - e.touches[1].clientX;
-                const dy = e.touches[0].clientY - e.touches[1].clientY;
-                lastTouchDistance = Math.sqrt(dx * dx + dy * dy);
-            }
+if (e.touches.length === 1) {
+    const touch = e.touches[0];
+    const { canvasX, canvasY } = getCanvasCoordinates(touch.clientX, touch.clientY);
+
+    holdTimer = setTimeout(() => {
+        const x = Math.floor(canvasX / PIXEL_SIZE);
+        const y = Math.floor(canvasY / PIXEL_SIZE);
+        const key = `${x}-${y}`;
+        if (!pixelData[key]) {
+            selectedPixel = { x, y };
+            document.getElementById('pixelCoords').textContent = `(${x}, ${y})`;
+            document.getElementById('colorPicker').style.display = 'flex';
+        } else showNotification('This pixel is already colored!');
+    }, 200);
+}
         }
 
         function handleTouchMove(e) {
             e.preventDefault();
+            if (holdTimer) { clearTimeout(holdTimer); holdTimer = null; }
             if (e.touches.length === 1 && isDragging) {
                 const touch = e.touches[0];
                 translateX = touch.clientX - startX;
@@ -542,6 +546,7 @@ async function loadPixelData() {
         }
 
         function handleTouchEnd(e) {
+            if (holdTimer) { clearTimeout(holdTimer); holdTimer = null; }
             if (e.touches.length < 2) {
                 lastTouchDistance = 0;
             }
@@ -615,12 +620,23 @@ async function loadPixelData() {
         }
 
 async function applyColor() {
+    if (!canPaint) {
+        showNotification('Watch the ad first.');
+        return;
+    }
+    
     if (!selectedPixel) {
         showNotification('No pixel selected!');
         return;
     }
 
     const color = document.getElementById('customColor').value;
+    
+    if (!/^#[0-9A-Fa-f]{6}$/.test(color)) {
+        showNotification('Invalid color!');
+        return;
+    }
+
     const pixelKey = `${selectedPixel.x}-${selectedPixel.y}`;
 
     try {
@@ -640,7 +656,6 @@ async function applyColor() {
         if (result.success) {
             pixelData[pixelKey] = color;
             coloredPixels++;
-            updateStats();
 
             ctx.fillStyle = color;
             ctx.fillRect(
@@ -661,16 +676,25 @@ async function applyColor() {
     showVideo();
     selectedPixel = null;
 }
-        function showVideo() {
-            const overlay = document.getElementById('videoOverlay');
-            const video = document.getElementById('adVideo');
-            const closeBtn = document.getElementById('closeVideo');
-            
-            overlay.style.display = 'flex';
-            closeBtn.style.display = 'none';
-            video.currentTime = 0;
-            video.play();
-        }
+
+    function showVideo() {
+    const overlay = document.getElementById('videoOverlay');
+    const video = document.getElementById('adVideo');
+    const closeBtn = document.getElementById('closeVideo');
+
+    overlay.style.display = 'flex';
+    closeBtn.style.display = 'none';
+    video.currentTime = 0;
+
+    video.muted = true;
+
+    const playPromise = video.play();
+    if (playPromise !== undefined) {
+        playPromise.catch(error => {
+            console.log('AD - play blocked, waiting for user interaction', error);
+        });
+    }
+}
 
         function setupVideoEvents() {
             const video = document.getElementById('adVideo');
@@ -679,6 +703,7 @@ async function applyColor() {
             
             video.addEventListener('ended', () => {
                 closeBtn.style.display = 'block';
+                canPaint = true;
             });
             
             closeBtn.addEventListener('click', () => {
@@ -686,12 +711,6 @@ async function applyColor() {
                 overlay.style.display = 'none';
                 closeBtn.style.display = 'none';
             });
-        }
-
-        function updateStats() {
-            const percentage = ((coloredPixels / totalPixels) * 100).toFixed(2);
-            document.getElementById('statsText').textContent = 
-                `Colored: ${coloredPixels.toLocaleString()} / ${totalPixels.toLocaleString()} (${percentage}%)`;
         }
 
         function showNotification(message) {
