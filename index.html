@@ -335,7 +335,7 @@
         <button class="close-button" id="closeVideo">✕</button>
         <div class="video-container">
             <video id="adVideo" preload="auto">
-                <source src="https://pub-e1dbcd517f474942a29b0e8d495a5ca9.r2.dev/recl.mp4" type="video/mp4">
+                <source src="Assets/video.mp3" type="video/mp3">
             </video>
         </div>
     </div>
@@ -623,9 +623,6 @@ async function applyColor() {
     const color = document.getElementById('customColor').value;
     const pixelKey = `${selectedPixel.x}-${selectedPixel.y}`;
 
-    closeColorPicker();
-    showVideo();
-
     try {
         const response = await fetch(`${WORKER_URL}/pixel`, {
             method: 'POST',
@@ -653,16 +650,17 @@ async function applyColor() {
                 PIXEL_SIZE
             );
         } else {
-            showNotification(result.message || 'Error save');
+            showNotification(result.message || 'Error saving pixel');
         }
     } catch (e) {
         console.error(e);
-        showNotification('Error connection');
+        showNotification('Error connecting to server');
     }
 
+    closeColorPicker();
+    showVideo();
     selectedPixel = null;
 }
-
         function showVideo() {
             const overlay = document.getElementById('videoOverlay');
             const video = document.getElementById('adVideo');
