@@ -364,6 +364,7 @@ const colors = [
 
 let pixelData = {};
 let selectedPixel = null;
+let selectedColorDuringAd = null;
 let totalPixels = GRID_SIZE * GRID_SIZE;
 let coloredPixels = 0;
 
@@ -625,7 +626,6 @@ function getCanvasCoordinates(clientX, clientY) {
 
 function closeColorPicker() {
     colorPickerModal.style.display = 'none';
-    selectedPixel = null;
 }
 
 function applyColor() {
@@ -642,6 +642,7 @@ function applyColor() {
     }
 
     if (!adWatchedAndReady) {
+        selectedColorDuringAd = color; 
         closeColorPicker();
         showVideo();
         return;
@@ -687,17 +688,19 @@ async function finalizePixelDraw(color) {
 
     selectedPixel = null;
     adWatchedAndReady = false;
+    selectedColorDuringAd = null;
 }
 
 function showVideo() {
     videoOverlay.style.display = 'flex';
     closeVideoBtn.style.display = 'none';
     adVideo.currentTime = 0;
+    adVideo.muted = true; 
 
     const playPromise = adVideo.play();
     if (playPromise !== undefined) {
         playPromise.catch(error => {
-            console.log('AD - play blocked, waiting for user interaction', error);
+            showNotification('Video playback blocked. Tap the screen to start the ad.');
         });
     }
 }
@@ -709,17 +712,18 @@ function setupVideoEvents() {
     });
     
     closeVideoBtn.addEventListener('click', () => {
-        const color = customColorInput.value;
+        const colorToDraw = selectedColorDuringAd; 
         
         adVideo.pause();
         videoOverlay.style.display = 'none';
         closeVideoBtn.style.display = 'none';
         
-        if (selectedPixel && adWatchedAndReady) {
-            finalizePixelDraw(color);
+        if (selectedPixel && adWatchedAndReady && colorToDraw) {
+            finalizePixelDraw(colorToDraw);
         } else {
             selectedPixel = null;
             adWatchedAndReady = false;
+            selectedColorDuringAd = null;
         }
     });
 }
