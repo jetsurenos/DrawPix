@@ -1,0 +1,13 @@
+/* TEAM */
+Developers: Sliz®
+Site: https://drawpix.space
+Company: https://github.com/SlizR/
+Github: https://github.com/SlizR/DrawPix/
+Contact: markd.voznyuk@gmail.com
+
+/* TECHNOLOGY */
+Language: HTML5, CSS3, JS, Claudflare Workers
+Frameworks: Tailwind, Astro/React, Workers
+Server site: Claudflare
+Server: Claudflare Workers
+Site: Github, Github Pages
