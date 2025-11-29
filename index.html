@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>DrawPix</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            touch-action: none;
+        }
+
+        .ui-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            padding: 15px;
+            pointer-events: none;
+        }
+
+        .header h1 {
+            font-size: 1.8em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .stats {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            padding: 12px 25px;
+            border-radius: 25px;
+            color: white;
+            font-size: 0.95em;
+            z-index: 100;
+            pointer-events: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .zoom-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 100;
+            pointer-events: auto;
+        }
+
+        .zoom-btn {
+            width: 50px;
+            height: 50px;
+            background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(10px);
+            border: none;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .zoom-btn:hover {
+            transform: scale(1.1);
+            background: white;
+        }
+
+        .zoom-btn:active {
+            transform: scale(0.95);
+        }
+
+        .canvas-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .canvas-container {
+            transform-origin: center center;
+            transition: transform 0.1s ease-out;
+            cursor: grab;
+        }
+
+        .canvas-container.grabbing {
+            cursor: grabbing;
+        }
+
+        #pixelCanvas {
+            display: block;
+            background: white;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            image-rendering: pixelated;
+            border: 3px solid #333;
+        }
+
+        .color-picker-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .color-picker-content {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            max-width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .color-picker-content h2 {
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 1.3em;
+        }
+
+        .color-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(45px, 1fr));
+            gap: 8px;
+            margin: 15px 0;
+            max-width: 400px;
+        }
+
+        .color-option {
+            width: 45px;
+            height: 45px;
+            border-radius: 10px;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .color-option:hover {
+            transform: scale(1.1);
+            border-color: #333;
+        }
+
+        .custom-color-section {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid #eee;
+        }
+
+        .custom-color-section input[type="color"] {
+            width: 80px;
+            height: 45px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 10px;
+            font-size: 0.95em;
+            cursor: pointer;
+            margin: 8px 5px;
+            transition: transform 0.2s;
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+        }
+
+        .video-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .video-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .close-button {
+            display: none;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.9);
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 2001;
+            transition: all 0.3s;
+        }
+
+        .close-button:hover {
+            background: white;
+            transform: rotate(90deg);
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            z-index: 3000;
+            display: none;
+            max-width: 300px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.4em;
+            }
+            .header p {
+                font-size: 0.85em;
+            }
+            .stats {
+                font-size: 0.85em;
+                padding: 10px 20px;
+            }
+            .zoom-btn {
+                width: 45px;
+                height: 45px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="ui-overlay">
+        <div class="header">
+            <h1>DrawPix</h1>
+            <p>Paint a pixel from over 20,000 options and save your story.</p>
+        </div>
+    </div>
+
+    <div class="stats">
+        <span id="statsText">Loading...</span>
+    </div>
+
+    <div class="zoom-controls">
+        <button class="zoom-btn" onclick="zoomIn()" title="Zoom in">+</button>
+        <button class="zoom-btn" onclick="zoomOut()" title="Move away">−</button>
+        <button class="zoom-btn" onclick="resetZoom()" title="Reset">⟲</button>
+    </div>
+
+    <div class="canvas-wrapper">
+        <div class="canvas-container" id="canvasContainer">
+            <canvas id="pixelCanvas" width="800" height="800"></canvas>
+        </div>
+    </div>
+
+    <div class="color-picker-modal" id="colorPicker">
+        <div class="color-picker-content">
+            <h2>Choose a color for the pixel</h2>
+            <p>Coordinates: <strong id="pixelCoords"></strong></p>
+            
+            <div class="color-options" id="colorOptions"></div>
+            
+            <div class="custom-color-section">
+                <p>Or choose your color:</p>
+                <input type="color" id="customColor" value="#ff0000">
+            </div>
+            
+            <div>
+                <button class="button" onclick="applyColor()">Apply color</button>
+                <button class="button" onclick="closeColorPicker()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="video-overlay" id="videoOverlay">
+        <button class="close-button" id="closeVideo">✕</button>
+        <div class="video-container">
+            <video id="adVideo" preload="auto">
+                <source src="recl.mp4" type="video/mp4">
+            </video>
+        </div>
+    </div>
+
+    <div class="notification" id="notification"></div>
+
+    <script>
+        const WORKER_URL = 'https://pix.markd-voznyuk.workers.dev';
+        const AUTH_CODE = 'px_7k9mQ2vL8nR4wX6pT3jH5sY1cF0dZ9bN';
+        const CANVAS_SIZE = 800;
+        const PIXEL_SIZE = 5;
+        const GRID_SIZE = CANVAS_SIZE / PIXEL_SIZE;
+
+        const canvas = document.getElementById('pixelCanvas');
+        const ctx = canvas.getContext('2d');
+        const container = document.getElementById('canvasContainer');
+        
+        const colors = [
+            '#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF', '#FFA500', '#800080',
+            '#FFC0CB', '#A52A2A', '#808080', '#000000', '#FFFFFF', '#FFD700', '#4B0082', '#00FF7F'
+        ];
+
+        let pixelData = {};
+        let selectedPixel = null;
+        let totalPixels = GRID_SIZE * GRID_SIZE;
+        let coloredPixels = 0;
+
+        let scale = 1;
+        let translateX = 0;
+        let translateY = 0;
+        let isDragging = false;
+        let startX = 0;
+        let startY = 0;
+        let lastTouchDistance = 0;
+
+        function init() {
+            createColorOptions();
+            loadPixelData();
+            setupCanvas();
+            setupVideoEvents();
+            setupZoomAndPan();
+        }
+
+        function createColorOptions() {
+            const colorOptions = document.getElementById('colorOptions');
+            colors.forEach(color => {
+                const div = document.createElement('div');
+                div.className = 'color-option';
+                div.style.backgroundColor = color;
+                div.onclick = () => {
+                    document.getElementById('customColor').value = color;
+                };
+                colorOptions.appendChild(div);
+            });
+        }
+
+        async function loadPixelData() {
+            try {
+                const response = await fetch(`${WORKER_URL}/pixels`, {
+                    headers: {
+                        'X-Auth-Code': AUTH_CODE
+                    }
+                });
+                pixelData = await response.json();
+                coloredPixels = Object.keys(pixelData).length;
+                updateStats();
+                drawCanvas();
+            } catch (e) {
+                showNotification('Error connection to server');
+            }
+        }
+
+        function setupCanvas() {
+            ctx.fillStyle = '#f5f5f5';
+            ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+            
+            ctx.strokeStyle = '#e0e0e0';
+            ctx.lineWidth = 0.5;
+            for (let i = 0; i <= GRID_SIZE; i++) {
+                ctx.beginPath();
+                ctx.moveTo(i * PIXEL_SIZE, 0);
+                ctx.lineTo(i * PIXEL_SIZE, CANVAS_SIZE);
+                ctx.stroke();
+                
+                ctx.beginPath();
+                ctx.moveTo(0, i * PIXEL_SIZE);
+                ctx.lineTo(CANVAS_SIZE, i * PIXEL_SIZE);
+                ctx.stroke();
+            }
+        }
+
+        function drawCanvas() {
+            for (const key in pixelData) {
+                const [x, y] = key.split('-').map(Number);
+                ctx.fillStyle = pixelData[key];
+                ctx.fillRect(x * PIXEL_SIZE, y * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE);
+            }
+        }
+
+        function setupZoomAndPan() {
+            canvas.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                return false;
+            });
+
+            canvas.addEventListener('mousedown', handleMouseDown);
+            document.addEventListener('mousemove', handleMouseMove);
+            document.addEventListener('mouseup', handleMouseUp);
+            canvas.addEventListener('wheel', handleWheel, { passive: false });
+
+            canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+            document.addEventListener('touchmove', handleTouchMove, { passive: false });
+            document.addEventListener('touchend', handleTouchEnd);
+        }
+
+        function handleMouseDown(e) {
+            e.preventDefault();
+            
+            if (e.button === 0) {
+                const { canvasX, canvasY } = getCanvasCoordinates(e.clientX, e.clientY);
+                
+                if (canvasX >= 0 && canvasX < CANVAS_SIZE && 
+                    canvasY >= 0 && canvasY < CANVAS_SIZE) {
+                    
+                    const x = Math.floor(canvasX / PIXEL_SIZE);
+                    const y = Math.floor(canvasY / PIXEL_SIZE);
+                    
+                    if (x >= 0 && x < GRID_SIZE && y >= 0 && y < GRID_SIZE) {
+                        const pixelKey = `${x}-${y}`;
+                        if (pixelData[pixelKey]) {
+                            showNotification('This pixel is already colored!');
+                            return;
+                        }
+                        selectedPixel = { x, y };
+                        document.getElementById('pixelCoords').textContent = `(${x}, ${y})`;
+                        document.getElementById('colorPicker').style.display = 'flex';
+                        return;
+                    }
+                }
+            }
+            
+            if (e.button === 2) {
+                isDragging = true;
+                startX = e.clientX - translateX;
+                startY = e.clientY - translateY;
+                container.classList.add('grabbing');
+            }
+        }
+
+        function handleMouseMove(e) {
+            if (!isDragging) return;
+            e.preventDefault();
+            translateX = e.clientX - startX;
+            translateY = e.clientY - startY;
+            updateTransform();
+        }
+
+        function handleMouseUp() {
+            isDragging = false;
+            container.classList.remove('grabbing');
+        }
+
+        function handleWheel(e) {
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? 0.9 : 1.1;
+            scale *= delta;
+            scale = Math.max(0.5, Math.min(10, scale));
+            updateTransform();
+        }
+
+        function handleTouchStart(e) {
+            if (e.touches.length === 1) {
+                const touch = e.touches[0];
+                isDragging = true;
+                startX = touch.clientX - translateX;
+                startY = touch.clientY - translateY;
+                container.classList.add('grabbing');
+            } else if (e.touches.length === 2) {
+                isDragging = false;
+                container.classList.remove('grabbing');
+                const dx = e.touches[0].clientX - e.touches[1].clientX;
+                const dy = e.touches[0].clientY - e.touches[1].clientY;
+                lastTouchDistance = Math.sqrt(dx * dx + dy * dy);
+            }
+        }
+
+        function handleTouchMove(e) {
+            e.preventDefault();
+            if (e.touches.length === 1 && isDragging) {
+                const touch = e.touches[0];
+                translateX = touch.clientX - startX;
+                translateY = touch.clientY - startY;
+                updateTransform();
+            } else if (e.touches.length === 2) {
+                const dx = e.touches[0].clientX - e.touches[1].clientX;
+                const dy = e.touches[0].clientY - e.touches[1].clientY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (lastTouchDistance > 0) {
+                    const delta = distance / lastTouchDistance;
+                    scale *= delta;
+                    scale = Math.max(0.5, Math.min(10, scale));
+                    updateTransform();
+                }
+                lastTouchDistance = distance;
+            }
+        }
+
+        function handleTouchEnd(e) {
+            if (e.touches.length < 2) {
+                lastTouchDistance = 0;
+            }
+            if (e.touches.length === 0) {
+                isDragging = false;
+                container.classList.remove('grabbing');
+                
+                if (e.changedTouches.length === 1) {
+                    const touch = e.changedTouches[0];
+                    const { canvasX, canvasY } = getCanvasCoordinates(touch.clientX, touch.clientY);
+                    
+                    if (canvasX >= 0 && canvasX < CANVAS_SIZE && 
+                        canvasY >= 0 && canvasY < CANVAS_SIZE) {
+                        
+                        const x = Math.floor(canvasX / PIXEL_SIZE);
+                        const y = Math.floor(canvasY / PIXEL_SIZE);
+                        
+                        if (x >= 0 && x < GRID_SIZE && y >= 0 && y < GRID_SIZE) {
+                            const pixelKey = `${x}-${y}`;
+                            if (pixelData[pixelKey]) {
+                                showNotification('This pixel is already colored!');
+                                return;
+                            }
+                            selectedPixel = { x, y };
+                            document.getElementById('pixelCoords').textContent = `(${x}, ${y})`;
+                            document.getElementById('colorPicker').style.display = 'flex';
+                        }
+                    }
+                }
+            }
+        }
+
+        function zoomIn() {
+            scale *= 1.3;
+            scale = Math.min(10, scale);
+            updateTransform();
+        }
+
+        function zoomOut() {
+            scale *= 0.7;
+            scale = Math.max(0.5, scale);
+            updateTransform();
+        }
+
+        function resetZoom() {
+            scale = 1;
+            translateX = 0;
+            translateY = 0;
+            updateTransform();
+        }
+
+        function updateTransform() {
+            container.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+        }
+
+        function getCanvasCoordinates(clientX, clientY) {
+            const rect = canvas.getBoundingClientRect();
+            
+            const screenX = clientX - rect.left;
+            const screenY = clientY - rect.top;
+            
+            const canvasX = (screenX / rect.width) * CANVAS_SIZE;
+            const canvasY = (screenY / rect.height) * CANVAS_SIZE;
+            
+            return { canvasX, canvasY };
+        }
+
+        function closeColorPicker() {
+            document.getElementById('colorPicker').style.display = 'none';
+            selectedPixel = null;
+        }
+
+        async function applyColor() {
+            if (!selectedPixel) return;
+            
+            const color = document.getElementById('customColor').value;
+            const pixelKey = `${selectedPixel.x}-${selectedPixel.y}`;
+            
+            closeColorPicker();
+            showVideo();
+            
+            try {
+                const response = await fetch(`${WORKER_URL}/pixel`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'X-Auth-Code': AUTH_CODE
+                    },
+                    body: JSON.stringify({
+                        x: selectedPixel.x,
+                        y: selectedPixel.y,
+                        color: color
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    pixelData[pixelKey] = color;
+                    coloredPixels++;
+                    updateStats();
+                    
+                    ctx.fillStyle = color;
+                    ctx.fillRect(
+                        selectedPixel.x * PIXEL_SIZE,
+                        selectedPixel.y * PIXEL_SIZE,
+                        PIXEL_SIZE,
+                        PIXEL_SIZE
+                    );
+                } else {
+                    showNotification(result.message || 'Error save');
+                }
+            } catch (e) {
+                showNotification('Error connection');
+            }
+            
+            selectedPixel = null;
+        }
+
+        function showVideo() {
+            const overlay = document.getElementById('videoOverlay');
+            const video = document.getElementById('adVideo');
+            const closeBtn = document.getElementById('closeVideo');
+            
+            overlay.style.display = 'flex';
+            closeBtn.style.display = 'none';
+            video.currentTime = 0;
+            video.play();
+        }
+
+        function setupVideoEvents() {
+            const video = document.getElementById('adVideo');
+            const closeBtn = document.getElementById('closeVideo');
+            const overlay = document.getElementById('videoOverlay');
+            
+            video.addEventListener('ended', () => {
+                closeBtn.style.display = 'block';
+            });
+            
+            closeBtn.addEventListener('click', () => {
+                video.pause();
+                overlay.style.display = 'none';
+                closeBtn.style.display = 'none';
+            });
+        }
+
+        function updateStats() {
+            const percentage = ((coloredPixels / totalPixels) * 100).toFixed(2);
+            document.getElementById('statsText').textContent = 
+                `Colored: ${coloredPixels.toLocaleString()} / ${totalPixels.toLocaleString()} (${percentage}%)`;
+        }
+
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.style.display = 'block';
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+
+        init();
+    </script>
+</body>
+</html>
