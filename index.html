@@ -30,289 +30,341 @@
   "description": "DrawPix - A project for artists where you can leave your anonymous pixel from over 26,800 independent pixels"
 }
     </script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
 
-        html, body {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            touch-action: none;
-        }
+    html, body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        touch-action: none;
+    }
 
-        .ui-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            z-index: 100;
-            pointer-events: none;
-        }
+    .ui-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 100;
+        pointer-events: none;
+    }
 
-        .header {
-            text-align: center;
-            color: white;
-            padding: 15px;
-            pointer-events: none;
-        }
+    .header {
+        text-align: center;
+        color: white;
+        padding: 15px;
+        pointer-events: none;
+    }
 
+    .header h1 {
+        font-size: 1.8em;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        margin-bottom: 5px;
+    }
+
+    .header p {
+        font-size: 0.9em;
+        opacity: 0.9;
+    }
+
+    .stats {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(255,255,255,0.2);
+        backdrop-filter: blur(10px);
+        padding: 12px 25px;
+        border-radius: 25px;
+        color: white;
+        font-size: 0.95em;
+        z-index: 100;
+        pointer-events: none;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    .zoom-controls {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        z-index: 100;
+        pointer-events: auto;
+    }
+
+    .zoom-btn {
+        width: 50px;
+        height: 50px;
+        background: rgba(255,255,255,0.9);
+        backdrop-filter: blur(10px);
+        border: none;
+        border-radius: 50%;
+        font-size: 24px;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .zoom-btn:hover {
+        transform: scale(1.1);
+        background: white;
+    }
+
+    .zoom-btn:active {
+        transform: scale(0.95);
+    }
+
+    .canvas-wrapper {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    .canvas-container {
+        transform-origin: center center;
+        transition: transform 0.1s ease-out;
+        cursor: grab;
+    }
+
+    .canvas-container.grabbing {
+        cursor: grabbing;
+    }
+
+    #pixelCanvas {
+        display: block;
+        background: white;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        image-rendering: pixelated;
+        border: 3px solid #333;
+    }
+
+    .color-picker-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.8);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .color-picker-content {
+        background: white;
+        padding: 25px;
+        border-radius: 20px;
+        text-align: center;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        max-width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    .color-picker-content h2 {
+        margin-bottom: 15px;
+        color: #333;
+        font-size: 1.3em;
+    }
+
+    .color-options {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(45px, 1fr));
+        gap: 8px;
+        margin: 15px 0;
+        max-width: 400px;
+    }
+
+    .color-option {
+        width: 45px;
+        height: 45px;
+        border-radius: 10px;
+        cursor: pointer;
+        border: 3px solid transparent;
+        transition: all 0.3s;
+    }
+
+    .color-option:hover {
+        transform: scale(1.1);
+        border-color: #333;
+    }
+
+    .custom-color-section {
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 2px solid #eee;
+    }
+
+    .custom-color-section input[type="color"] {
+        width: 80px;
+        height: 45px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+    }
+
+    .button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 10px 25px;
+        border-radius: 10px;
+        font-size: 0.95em;
+        cursor: pointer;
+        margin: 8px 5px;
+        transition: transform 0.2s;
+    }
+
+    .button:hover {
+        transform: translateY(-2px);
+    }
+
+    .video-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: black;
+        z-index: 2000;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .video-container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+    }
+
+    .video-container video {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+    #timerContainer {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 40px;
+        height: 40px;
+        z-index: 2001;
+        cursor: default;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #timerContainer .timer-circle {
+        transform: rotate(-90deg);
+        transition: stroke-dashoffset 0.1s linear;
+    }
+
+    #timerText {
+        position: absolute;
+        font-size: 14px;
+        font-weight: bold;
+        color: white;
+        text-shadow: 0 0 5px black;
+    }
+
+    .close-button {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: rgba(255,255,255,0.9);
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        font-size: 20px;
+        cursor: pointer;
+        z-index: 2001;
+        transition: all 0.3s;
+        display: none;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .close-button:hover {
+        background: white;
+        transform: scale(1.1);
+    }
+    
+    #photoContainer {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 40px;
+        height: 40px;
+        z-index: 2001;
+        display: none;
+        border-radius: 50%;
+        overflow: hidden;
+        box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    }
+
+    #photoContainer img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: rgba(0,0,0,0.8);
+        color: white;
+        padding: 12px 20px;
+        border-radius: 10px;
+        z-index: 3000;
+        display: none;
+        max-width: 300px;
+    }
+
+    @media (max-width: 768px) {
         .header h1 {
-            font-size: 1.8em;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-            margin-bottom: 5px;
+            font-size: 1.4em;
         }
-
         .header p {
-            font-size: 0.9em;
-            opacity: 0.9;
+            font-size: 0.85em;
         }
-
         .stats {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(255,255,255,0.2);
-            backdrop-filter: blur(10px);
-            padding: 12px 25px;
-            border-radius: 25px;
-            color: white;
-            font-size: 0.95em;
-            z-index: 100;
-            pointer-events: none;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            font-size: 0.85em;
+            padding: 10px 20px;
         }
-
-        .zoom-controls {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            z-index: 100;
-            pointer-events: auto;
-        }
-
         .zoom-btn {
-            width: 50px;
-            height: 50px;
-            background: rgba(255,255,255,0.9);
-            backdrop-filter: blur(10px);
-            border: none;
-            border-radius: 50%;
-            font-size: 24px;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .zoom-btn:hover {
-            transform: scale(1.1);
-            background: white;
-        }
-
-        .zoom-btn:active {
-            transform: scale(0.95);
-        }
-
-        .canvas-wrapper {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
-
-        .canvas-container {
-            transform-origin: center center;
-            transition: transform 0.1s ease-out;
-            cursor: grab;
-        }
-
-        .canvas-container.grabbing {
-            cursor: grabbing;
-        }
-
-        #pixelCanvas {
-            display: block;
-            background: white;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            image-rendering: pixelated;
-            border: 3px solid #333;
-        }
-
-        .color-picker-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .color-picker-content {
-            background: white;
-            padding: 25px;
-            border-radius: 20px;
-            text-align: center;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-            max-width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .color-picker-content h2 {
-            margin-bottom: 15px;
-            color: #333;
-            font-size: 1.3em;
-        }
-
-        .color-options {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(45px, 1fr));
-            gap: 8px;
-            margin: 15px 0;
-            max-width: 400px;
-        }
-
-        .color-option {
             width: 45px;
             height: 45px;
-            border-radius: 10px;
-            cursor: pointer;
-            border: 3px solid transparent;
-            transition: all 0.3s;
         }
-
-        .color-option:hover {
-            transform: scale(1.1);
-            border-color: #333;
+        .close-button, #timerContainer, #photoContainer {
+            width: 35px;
+            height: 35px;
+            font-size: 18px;
         }
-
-        .custom-color-section {
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 2px solid #eee;
-        }
-
-        .custom-color-section input[type="color"] {
-            width: 80px;
-            height: 45px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-        }
-
-        .button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 10px 25px;
-            border-radius: 10px;
-            font-size: 0.95em;
-            cursor: pointer;
-            margin: 8px 5px;
-            transition: transform 0.2s;
-        }
-
-        .button:hover {
-            transform: translateY(-2px);
-        }
-
-        .video-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: black;
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .video-container {
-            position: relative;
-            width: 100%;
-            height: 100%;
-        }
-
-        .video-container video {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-
-        .close-button {
-            display: none;
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(255,255,255,0.9);
-            border: none;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            font-size: 24px;
-            cursor: pointer;
-            z-index: 2001;
-            transition: all 0.3s;
-        }
-
-        .close-button:hover {
-            background: white;
-            transform: rotate(90deg);
-        }
-
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: rgba(0,0,0,0.8);
-            color: white;
-            padding: 12px 20px;
-            border-radius: 10px;
-            z-index: 3000;
-            display: none;
-            max-width: 300px;
-        }
-
-        @media (max-width: 768px) {
-            .header h1 {
-                font-size: 1.4em;
-            }
-            .header p {
-                font-size: 0.85em;
-            }
-            .stats {
-                font-size: 0.85em;
-                padding: 10px 20px;
-            }
-            .zoom-btn {
-                width: 45px;
-                height: 45px;
-            }
-        }
-    </style>
+    }
+</style>
 </head>
 <body>
     <div class="ui-overlay">
@@ -357,14 +409,24 @@
         </div>
     </div>
 
-    <div class="video-overlay" id="videoOverlay">
-        <button class="close-button" id="closeVideo">✕</button>
-        <div class="video-container">
-            <video id="adVideo" preload="auto">
-                <source src="Assets/origin.mp4" type="video/mp4">
-            </video>
-        </div>
+<div class="video-overlay" id="videoOverlay">
+    <div id="timerContainer">
+        <svg width="40" height="40" viewBox="0 0 40 40">
+            <circle cx="20" cy="20" r="18" fill="rgba(0,0,0,0.5)" />
+            <circle class="timer-circle" cx="20" cy="20" r="18" fill="none" stroke="#FFD700" stroke-width="4" stroke-linecap="round" />
+        </svg>
+        <span id="timerText"></span>
     </div>
+    <button class="close-button" id="closeVideo">✕</button>
+    <div id="photoContainer">
+        <img src="Assets/photo.png" alt="AD - E1 Photo">
+    </div>
+    <div class="video-container">
+        <video id="adVideo" preload="auto">
+            <source src="Assets/origin.mp4" type="video/mp4">
+        </video>
+    </div>
+</div>
 
     <div class="notification" id="notification"></div>
 
@@ -373,6 +435,7 @@ const WORKER_URL = 'https://pix.markd-voznyuk.workers.dev';
 const CANVAS_SIZE = 800;
 const PIXEL_SIZE = 5;
 const GRID_SIZE = CANVAS_SIZE / PIXEL_SIZE;
+const CLOSE_BUTTON_SIZE = 40;
 
 const canvas = document.getElementById('pixelCanvas');
 const ctx = canvas.getContext('2d');
@@ -382,6 +445,10 @@ const adVideo = document.getElementById('adVideo');
 const videoOverlay = document.getElementById('videoOverlay');
 const closeVideoBtn = document.getElementById('closeVideo');
 const customColorInput = document.getElementById('customColor');
+const timerContainer = document.getElementById('timerContainer');
+const timerCircle = timerContainer.querySelector('.timer-circle');
+const timerText = document.getElementById('timerText');
+const photoContainer = document.getElementById('photoContainer');
 
 const colors = [
     '#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF', '#FFA500', '#800080',
@@ -404,6 +471,7 @@ let lastTouchDistance = 0;
 let adWatchedAndReady = false;
 let holdTimer = null;
 let isSingleTouch = false;
+let updateTimerInterval = null;
 
 function init() {
     createColorOptions();
@@ -414,7 +482,7 @@ function init() {
     updateTransform();
     adVideo.setAttribute('playsinline', '');
     adVideo.setAttribute('preload', 'auto');
-    adVideo.muted = true; 
+    adVideo.muted = true;
 }
 
 function createColorOptions() {
@@ -670,7 +738,7 @@ function applyColor() {
     }
 
     if (!adWatchedAndReady) {
-        selectedColorDuringAd = color; 
+        selectedColorDuringAd = color;
         closeColorPicker();
         showVideo();
         return;
@@ -680,7 +748,7 @@ function applyColor() {
 }
 
 async function finalizePixelDraw(color) {
-    if (!selectedPixel) return; 
+    if (!selectedPixel) return;
     
     const pixelKey = `${selectedPixel.x}-${selectedPixel.y}`;
 
@@ -721,19 +789,53 @@ async function finalizePixelDraw(color) {
     selectedPixel = null;
     adWatchedAndReady = false;
     selectedColorDuringAd = null;
+    hidePostAdElements();
+}
+
+function updateTimer(duration) {
+    if (duration <= 0 || !adVideo.duration || adVideo.duration === Infinity) {
+        return;
+    }
+    const circumference = 2 * Math.PI * 18;
+    const timeRemaining = Math.max(0, Math.ceil(duration - adVideo.currentTime));
+    const percent = adVideo.currentTime / duration;
+    const offset = circumference * (1 - percent);
+    
+    timerCircle.style.strokeDasharray = circumference;
+    timerCircle.style.strokeDashoffset = offset;
+    timerText.textContent = timeRemaining;
 }
 
 function showVideo() {
     videoOverlay.style.display = 'flex';
+    timerContainer.style.display = 'flex';
     closeVideoBtn.style.display = 'none';
+    photoContainer.style.display = 'none';
     adVideo.currentTime = 0;
     adVideo.muted = true;
+    let videoDuration = 0;
 
     const markAdAsReady = () => {
         if (!adWatchedAndReady) {
             adWatchedAndReady = true;
-            closeVideoBtn.style.display = 'block';
             adVideo.pause();
+            clearInterval(updateTimerInterval);
+            timerContainer.style.display = 'none';
+            closeVideoBtn.style.display = 'flex';
+            photoContainer.style.display = 'block';
+        }
+    };
+    
+    const setupTimer = () => {
+        videoDuration = adVideo.duration;
+        if (videoDuration && videoDuration !== Infinity) {
+            clearInterval(updateTimerInterval);
+            updateTimerInterval = setInterval(() => {
+                updateTimer(videoDuration);
+                if (adVideo.currentTime >= videoDuration) {
+                    markAdAsReady();
+                }
+            }, 100);
         }
     };
     
@@ -745,6 +847,7 @@ function showVideo() {
                 .then(() => {
                     console.log('Video playing successfully.');
                     videoOverlay.onclick = null;
+                    setupTimer();
                 })
                 .catch(error => {
                     console.warn('Autoplay blocked/interrupted. User interaction required.');
@@ -753,20 +856,21 @@ function showVideo() {
                     videoOverlay.onclick = () => {
                         adVideo.play().then(() => {
                             videoOverlay.onclick = null;
+                            setupTimer();
                         }).catch(e => console.error('Play failed after manual click:', e));
                     };
                 });
         }
     };
 
-    adVideo.onended = markAdAsReady; 
-
+    adVideo.onended = markAdAsReady;
+    
     let progressCheckTimer = null;
     const progressCheck = () => {
-        if (adVideo.currentTime > 0.5) { 
+        if (adVideo.currentTime > 0.5) {
             adVideo.removeEventListener('timeupdate', progressCheck);
             if(progressCheckTimer) clearTimeout(progressCheckTimer);
-            
+            setupTimer();
             console.log('Initial playback confirmed. Waiting for full ad completion.');
             
             return;
@@ -779,25 +883,32 @@ function showVideo() {
         adVideo.removeEventListener('timeupdate', progressCheck);
         if (adVideo.currentTime < 1) {
              markAdAsReady();
-             showNotification('Video is stuck. You may close the ad or try clicking the video to continue.');
+             showNotification('Video is stuck. You may close the ad.');
         }
-    }, 5000); 
+    }, 5000);
 
     adVideo.onloadedmetadata = attemptPlay;
     adVideo.load();
-    videoOverlay.onclick = attemptPlay; 
+    videoOverlay.onclick = attemptPlay;
     
+}
+
+function hidePostAdElements() {
+    closeVideoBtn.style.display = 'none';
+    photoContainer.style.display = 'none';
+    timerContainer.style.display = 'none';
+    clearInterval(updateTimerInterval);
 }
 
 function setupVideoEvents() {
     
     closeVideoBtn.addEventListener('click', () => {
-        const colorToDraw = selectedColorDuringAd; 
+        const colorToDraw = selectedColorDuringAd;
         
         adVideo.pause();
         videoOverlay.style.display = 'none';
-        closeVideoBtn.style.display = 'none';
-        videoOverlay.onclick = null; 
+        hidePostAdElements();
+        videoOverlay.onclick = null;
 
         if (selectedPixel && adWatchedAndReady && colorToDraw) {
             finalizePixelDraw(colorToDraw);
