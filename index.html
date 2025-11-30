@@ -62,11 +62,30 @@
         pointer-events: none;
     }
 
-    .header h1 {
-        font-size: 1.8em;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        margin-bottom: 5px;
-    }
+.header h1 {
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    margin-bottom: 5px;
+}
+
+.h1-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    margin: 0;
+}
+
+.h1-container > span {
+    font-size: 60px;
+    margin: 0;
+}
+
+#pixCanvas {
+    width: 100px;
+    height: 60px;
+    display: block;
+    image-rendering: pixelated;
+}
 
     .header p {
         font-size: 0.9em;
@@ -372,12 +391,13 @@
 </head>
 <body>
     <div class="ui-overlay">
-        <div class="header">
-            <div style="display: flex; align-items: center; gap: 5px;">
-  <h1 style="font-size: 60px; margin: 0;">Draw</h1>
-  <canvas id="pixCanvas" width="200" height="80"></canvas>
+<div class="header">
+    <div class="h1-container">
+        <span>Draw</span>
+        <canvas id="pixCanvas" width="100" height="60"></canvas>
+    </div>
+    <p>Paint a pixel from over 20,000 options and save your story.</p>
 </div>
-            <p>Paint a pixel from over 20,000 options and save your story.</p>
         </div>
     </div>
 
@@ -441,28 +461,86 @@
     <div class="notification" id="notification"></div>
 
     <script>
-const canvas = document.getElementById('pixCanvas');
-const ctx = canvas.getContext('2d');
+document.addEventListener('DOMContentLoaded', (event) => {
+    const canvas = document.getElementById('pixCanvas');
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
 
-ctx.font = 'bold 60px sans-serif';
-ctx.fillStyle = 'black';
-ctx.fillText('Pix', 0, 60);
+    const pixelSize = 5;
+    
+    const P_shape = [
+        [1, 1, 1, 1, 0],
+        [1, 0, 0, 0, 1],
+        [1, 1, 1, 1, 0],
+        [1, 0, 0, 0, 0],
+        [1, 0, 0, 0, 0],
+        [1, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0]
+    ];
 
-const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-const data = imageData.data;
+    const I_shape = [
+        [0],
+        [1],
+        [1],
+        [1],
+        [1],
+        [1],
+        [1]
+    ];
+    
+    const X_shape = [
+        [1, 0, 0, 0, 1],
+        [0, 1, 0, 1, 0],
+        [0, 0, 1, 0, 0],
+        [0, 1, 0, 1, 0],
+        [1, 0, 0, 0, 1]
+    ];
 
-ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const colors = ['#FF4500', '#FFD700', '#32CD32', '#1E90FF', '#BA55D3', '#FF1493'];
 
-const pixelSize = 2;
-for (let y = 0; y < canvas.height; y += pixelSize) {
-    for (let x = 0; x < canvas.width; x += pixelSize) {
-        const idx = (y * canvas.width + x) * 4;
-        if (data[idx + 3] > 128) {
-            ctx.fillStyle = `rgb(${Math.random()*255|0}, ${Math.random()*255|0}, ${Math.random()*255|0})`;
-            ctx.fillRect(x, y, pixelSize, pixelSize);
-        }
-    }
-}
+    function getRandomColor() {
+        return colors[Math.floor(Math.random() * colors.length)];
+    }
+
+    function drawPixelLetter(shape, startX, startY, size) {
+        for (let row = 0; row < shape.length; row++) {
+            for (let col = 0; col < shape[row].length; col++) {
+                if (shape[row][col] === 1) {
+                    ctx.fillStyle = getRandomColor();
+                    const x = startX + col * size;
+                    const y = startY + row * size;
+                    ctx.fillRect(x, y, size, size);
+                }
+            }
+        }
+    }
+
+    ctx.clearRect(0, 0, width, height);
+
+    const paddingX = 10;
+    const letterSpacing = 8;
+    const letterHeight = 7 * pixelSize;
+    const letterP_width = 5 * pixelSize;
+    const letterI_width = 1 * pixelSize;
+    const letterX_width = 5 * pixelSize;
+    
+    const totalWidth = letterP_width + letterSpacing + letterI_width + letterSpacing + letterX_width;
+    const startY = (height - letterHeight) / 2;
+    let currentX = (width - totalWidth) / 2;
+
+    drawPixelLetter(P_shape, currentX, startY, pixelSize);
+    currentX += letterP_width + letterSpacing;
+
+    ctx.fillStyle = getRandomColor();
+    ctx.fillRect(currentX, startY, pixelSize, pixelSize); 
+    
+    drawPixelLetter(I_shape, currentX, startY + pixelSize * 2, pixelSize); 
+    currentX += letterI_width + letterSpacing;
+
+    const X_startY = startY + (letterHeight - 5 * pixelSize) / 2;
+    drawPixelLetter(X_shape, currentX, X_startY, pixelSize);
+});
 </script>
 
 <script>
