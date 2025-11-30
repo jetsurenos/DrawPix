@@ -571,6 +571,7 @@ let holdTimer = null;
 let isSingleTouch = false;
 let updateTimerInterval = null;
 let pixelBeforeAd = null;
+let hoverPixel = null;
 
 function init() {
     createColorOptions();
@@ -666,17 +667,40 @@ function drawCanvas() {
         ctx.stroke();
     }
 
-    let count = 0;
     for (const key in pixelData) {
         const [x, y] = key.split('-').map(Number);
         ctx.fillStyle = pixelData[key];
         ctx.fillRect(x * PIXEL_SIZE, y * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE);
-        count++;
     }
 
-    console.log('%c[RENDER]', 'color: #2980b9; font-weight: bold', `Canvas redrawn with ${count} colored pixels.`);
+    if (hoverPixel) {
+        ctx.strokeStyle = 'red';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(
+            hoverPixel.x * PIXEL_SIZE,
+            hoverPixel.y * PIXEL_SIZE,
+            PIXEL_SIZE,
+            PIXEL_SIZE
+        );
+    }
 }
 
+    canvas.addEventListener('mousemove', (e) => {
+    const { canvasX, canvasY } = getCanvasCoordinates(e.clientX, e.clientY);
+    const x = Math.floor(canvasX / PIXEL_SIZE);
+    const y = Math.floor(canvasY / PIXEL_SIZE);
+    
+    if (x >= 0 && x < GRID_SIZE && y >= 0 && y < GRID_SIZE) {
+        hoverPixel = { x, y };
+        drawCanvas();
+    }
+});
+
+canvas.addEventListener('mouseleave', () => {
+    hoverPixel = null;
+    drawCanvas();
+});
+    
 function setupZoomAndPan() {
     canvas.addEventListener('contextmenu', (e) => {
         e.preventDefault();
@@ -758,6 +782,12 @@ function handleWheel(e) {
 
 function handleTouchStart(e) {
     e.preventDefault();
+    if (e.touches.length === 1) {
+    const touch = e.touches[0];
+    const { canvasX, canvasY } = getCanvasCoordinates(touch.clientX, touch.clientY);
+    hoverPixel = { x: Math.floor(canvasX / PIXEL_SIZE), y: Math.floor(canvasY / PIXEL_SIZE) };
+    drawCanvas();
+}
     if (e.touches.length === 1) {
         isSingleTouch = true;
         isDragging = true;
