@@ -373,7 +373,10 @@
 <body>
     <div class="ui-overlay">
         <div class="header">
-            <h1>DrawPix</h1>
+            <div style="display: flex; align-items: center; gap: 5px;">
+  <h1 style="font-size: 60px; margin: 0;">Draw</h1>
+  <canvas id="pixCanvas" width="200" height="80"></canvas>
+</div>
             <p>Paint a pixel from over 20,000 options and save your story.</p>
         </div>
     </div>
@@ -436,6 +439,31 @@
 </div>
 
     <div class="notification" id="notification"></div>
+
+    <script>
+const canvas = document.getElementById('pixCanvas');
+const ctx = canvas.getContext('2d');
+
+ctx.font = 'bold 60px sans-serif';
+ctx.fillStyle = 'black';
+ctx.fillText('Pix', 0, 60);
+
+const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+const data = imageData.data;
+
+ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+const pixelSize = 2;
+for (let y = 0; y < canvas.height; y += pixelSize) {
+    for (let x = 0; x < canvas.width; x += pixelSize) {
+        const idx = (y * canvas.width + x) * 4;
+        if (data[idx + 3] > 128) {
+            ctx.fillStyle = `rgb(${Math.random()*255|0}, ${Math.random()*255|0}, ${Math.random()*255|0})`;
+            ctx.fillRect(x, y, pixelSize, pixelSize);
+        }
+    }
+}
+</script>
 
 <script>
 console.log('%c[DEBUG]', 'color: #1abc9c; font-weight: bold', 'Starting DrawPix debug for dev logging...');
