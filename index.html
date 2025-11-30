@@ -3,22 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <title>DrawPix - Leave your soel</title>
+    <title>DrawPix - Leave your anonymous pixel</title>
     <link rel="icon" href="favicon.ico">
-    <meta name="description" content="DrawPix - A project for artists where you can leave your anonymous pixel from over 26,800 independent pixels">
+    <meta name="description" content="DrawPix - A project for artists where you can leave your anonymous pixel from over 25,800 independent pixels">
     <meta name="keywords" content="draw, pixel, schoolchildren, students, DrawPix, Sliz, canvas, space">
     <meta name="author" content="Sliz®">
     <meta name="robots" content="index, follow">
     <link rel="icon" type="image/ico" href="https://drawpix.space/favicon.ico">
     <link rel="apple-touch-icon" href="https://fhai.pp.ua/icon.png">
     <meta property="og:title" content="DrawPix - Leave your soel">
-    <meta property="og:description" content="DrawPix - A project for artists where you can leave your anonymous pixel from over 26,800 independent pixels">
+    <meta property="og:description" content="DrawPix - A project for artists where you can leave your anonymous pixel from over 25,800 independent pixels">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://drawpix.space/">
     <meta property="og:image" content="https://drawpix.space/favicon.ico">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="DrawPix - Leave your soel">
-    <meta name="twitter:description" content="DrawPix - A project for artists where you can leave your anonymous pixel from over 26,800 independent pixels">
+    <meta name="twitter:description" content="DrawPix - A project for artists where you can leave your anonymous pixel from over 25,800 independent pixels">
     <meta name="twitter:image" content="https://drawpix.space/icon.png">
     <script type="application/ld+json">
 {
@@ -27,7 +27,7 @@
   "name": "DrawPix",
   "url": "https://drawpix.space/",
   "logo": "https://drawpix.space/favicon.ico",
-  "description": "DrawPix - A project for artists where you can leave your anonymous pixel from over 26,800 independent pixels"
+  "description": "DrawPix - A project for artists where you can leave your anonymous pixel from over 25,800 independent pixels"
 }
     </script>
 <style>
@@ -438,6 +438,96 @@
     <div class="notification" id="notification"></div>
 
 <script>
+console.log('%c[DEBUG]', 'color: #1abc9c; font-weight: bold', 'Starting DrawPix debug for dev logging...');
+
+const WORKER_URL_DEBUG = 'https://pix.markd-voznyuk.workers.dev';
+const CANVAS_SIZE_DEBUG = 800;
+const PIXEL_SIZE_DEBUG = 5;
+const GRID_SIZE_DEBUG = CANVAS_SIZE_DEBUG / PIXEL_SIZE_DEBUG;
+
+console.log('%c[CONFIG]', 'color: #3498db; font-weight: bold', 'Worker URL:', WORKER_URL_DEBUG);
+console.log('%c[CONFIG]', 'color: #3498db; font-weight: bold', 'Canvas Size (px):', CANVAS_SIZE_DEBUG);
+console.log('%c[CONFIG]', 'color: #3498db; font-weight: bold', 'Pixel Size (px):', PIXEL_SIZE_DEBUG);
+console.log('%c[CONFIG]', 'color: #3498db; font-weight: bold', 'Grid Size (pixels):', GRID_SIZE_DEBUG, 'x', GRID_SIZE_DEBUG);
+console.log('%c[CONFIG]', 'color: #3498db; font-weight: bold', 'Total Pixels:', GRID_SIZE_DEBUG * GRID_SIZE_DEBUG);
+
+function logWorkerMessage(type, message, data = null) {
+ let color = '';
+ switch (type) {
+ case 'SUCCESS':
+ color = '#2ecc71';
+ break;
+ case 'ERROR':
+ color = '#e74c3c';
+ break;
+ case 'INFO':
+ color = '#f39c12';
+ break;
+ case 'PIXEL':
+ color = '#9b59b6';
+ break;
+ default:
+ color = '#7f8c8d';
+ }
+ console.log(`%c[WORKER ${type}]`, `color: ${color}; font-weight: bold`, message, data ? data : '');
+}
+
+function logPixelInteraction(type, x, y, color = null) {
+ const key = `${x}-${y}`;
+ let colorLog = color ? `Color: ${color}` : '';
+ console.log(`%c[PIXEL INTERACTION - ${type}]`, 'color: #9b59b6; font-weight: bold', `Coords: (${x}, ${y}) | Key: ${key} ${colorLog}`);
+}
+
+const originalShowNotification = window.showNotification;
+window.showNotification = (message) => {
+ console.log('%c[UI NOTIFICATION]', 'color: #d35400; font-weight: bold', message);
+ if (originalShowNotification) {
+ originalShowNotification(message);
+ }
+};
+
+async function logLoadPixelData(originalLoadFunction) {
+ console.log('%c[DATA FETCH]', 'color: #34495e; font-weight: bold', 'Attempting to load pixel data...');
+ try {
+ const response = await fetch(`${WORKER_URL_DEBUG}/pixels`);
+ const result = await response.json();
+ const count = Object.keys(result.data).length;
+ logWorkerMessage('SUCCESS', 'Pixel data loaded.', `Total colored pixels: ${count}`);
+ return result;
+ } catch (e) {
+ logWorkerMessage('ERROR', 'Failed to load pixel data.', e.message);
+ throw e;
+ }
+}
+
+async function logFinalizePixelDraw(x, y, color, originalFinalizeFunction) {
+ console.log('%c[API CALL]', 'color: #8e44ad; font-weight: bold', `Sending pixel update for (${x}, ${y}) with color ${color}...`);
+ const pixelKey = `${x}-${y}`;
+ try {
+ const response = await fetch(`${WORKER_URL_DEBUG}/pixel`, {
+ method: 'POST',
+ headers: { 'Content-Type': 'application/json' },
+ body: JSON.stringify({ x, y, color })
+ });
+ const result = await response.json();
+
+ if (result.success) {
+ logWorkerMessage('SUCCESS', `Pixel (${x}, ${y}) drawn.`, result);
+ } else {
+ logWorkerMessage('ERROR', `Pixel draw failed for (${x}, ${y}).`, result.message);
+ }
+ return result;
+ } catch (e) {
+ logWorkerMessage('ERROR', `Network error during pixel draw for (${x}, ${y}).`, e.message);
+ throw e;
+ }
+}
+
+console.log('%c[DEBUG]', 'color: #1abc9c; font-weight: bold', 'Debug functions set up. Logic will execute in the main script block.');
+
+</script>
+
+<script>
 const WORKER_URL = 'https://pix.markd-voznyuk.workers.dev';
 const CANVAS_SIZE = 800;
 const PIXEL_SIZE = 5;
@@ -483,7 +573,7 @@ let updateTimerInterval = null;
 
 function init() {
     createColorOptions();
-    loadPixelData();
+    loadPixelData().catch(() => {});
     setupCanvas();
     setupVideoEvents();
     setupZoomAndPan();
@@ -491,6 +581,7 @@ function init() {
     adVideo.setAttribute('playsinline', '');
     adVideo.setAttribute('preload', 'auto');
     adVideo.muted = true;
+    console.log('%c[INIT]', 'color: #27ae60; font-weight: bold', 'Initialization complete. Canvas ready.');
 }
 
 function createColorOptions() {
@@ -501,6 +592,7 @@ function createColorOptions() {
         div.style.backgroundColor = color;
         div.onclick = () => {
             customColorInput.value = color;
+            console.log('%c[COLOR PICKER]', 'color: #f1c40f; font-weight: bold', 'Color selected:', color);
         };
         colorOptions.appendChild(div);
     });
@@ -508,13 +600,14 @@ function createColorOptions() {
 
 async function loadPixelData() {
     try {
-        const response = await fetch(`${WORKER_URL}/pixels`);
-        const result = await response.json();
+        const result = await logLoadPixelData(null);
         pixelData = result.data;
         coloredPixels = Object.keys(pixelData).length;
         drawCanvas();
+        document.getElementById('statsText').textContent = `Pixels: ${coloredPixels} / ${totalPixels} | © 2025 Sliz®`;
     } catch (e) {
         showNotification('Error connection to server');
+        throw e;
     }
 }
 
@@ -538,11 +631,14 @@ function setupCanvas() {
 }
 
 function drawCanvas() {
+    let count = 0;
     for (const key in pixelData) {
         const [x, y] = key.split('-').map(Number);
         ctx.fillStyle = pixelData[key];
         ctx.fillRect(x * PIXEL_SIZE, y * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE);
+        count++;
     }
+    console.log('%c[RENDER]', 'color: #2980b9; font-weight: bold', `Canvas redrawn with ${count} colored pixels.`);
 }
 
 function setupZoomAndPan() {
@@ -577,11 +673,13 @@ function handleMouseDown(e) {
                 const pixelKey = `${x}-${y}`;
                 if (pixelData[pixelKey]) {
                     showNotification('This pixel is already colored!');
+                    logPixelInteraction('ALREADY COLORED', x, y, pixelData[pixelKey]);
                     return;
                 }
                 selectedPixel = { x, y };
                 document.getElementById('pixelCoords').textContent = `(${x}, ${y})`;
                 colorPickerModal.style.display = 'flex';
+                logPixelInteraction('SELECTED', x, y);
                 return;
             }
         }
@@ -592,6 +690,7 @@ function handleMouseDown(e) {
         startX = e.clientX - translateX;
         startY = e.clientY - translateY;
         container.classList.add('grabbing');
+        console.log('%c[PAN]', 'color: #e67e22; font-weight: bold', 'Start dragging.');
     }
 }
 
@@ -604,6 +703,9 @@ function handleMouseMove(e) {
 }
 
 function handleMouseUp() {
+    if (isDragging) {
+        console.log('%c[PAN]', 'color: #e67e22; font-weight: bold', `Stop dragging. Current Translation: (${translateX.toFixed(2)}px, ${translateY.toFixed(2)}px)`);
+    }
     isDragging = false;
     container.classList.remove('grabbing');
 }
@@ -611,9 +713,11 @@ function handleMouseUp() {
 function handleWheel(e) {
     e.preventDefault();
     const delta = e.deltaY > 0 ? 0.9 : 1.1;
+    const oldScale = scale;
     scale *= delta;
     scale = Math.max(0.5, Math.min(10, scale));
     updateTransform();
+    console.log('%c[ZOOM]', 'color: #9b59b6; font-weight: bold', `Zoom: ${oldScale.toFixed(2)} -> ${scale.toFixed(2)}`);
 }
 
 function handleTouchStart(e) {
@@ -639,8 +743,10 @@ function handleTouchStart(e) {
                     colorPickerModal.style.display = 'flex';
                     isDragging = false;
                     container.classList.remove('grabbing');
+                    logPixelInteraction('SELECTED (TOUCH)', x, y);
                 } else {
                     showNotification('This pixel is already colored!');
+                    logPixelInteraction('ALREADY COLORED (TOUCH)', x, y, pixelData[key]);
                 }
             }
         }, 300);
@@ -671,9 +777,11 @@ function handleTouchMove(e) {
         
         if (lastTouchDistance > 0) {
             const delta = distance / lastTouchDistance;
+            const oldScale = scale;
             scale *= delta;
             scale = Math.max(0.5, Math.min(10, scale));
             updateTransform();
+             console.log('%c[ZOOM (TOUCH)]', 'color: #9b59b6; font-weight: bold', `Zoom: ${oldScale.toFixed(2)} -> ${scale.toFixed(2)}`);
         }
         lastTouchDistance = distance;
     }
@@ -694,15 +802,19 @@ function handleTouchEnd(e) {
 }
 
 function zoomIn() {
+    const oldScale = scale;
     scale *= 1.3;
     scale = Math.min(10, scale);
     updateTransform();
+    console.log('%c[ZOOM]', 'color: #9b59b6; font-weight: bold', `Button Zoom In: ${oldScale.toFixed(2)} -> ${scale.toFixed(2)}`);
 }
 
 function zoomOut() {
+    const oldScale = scale;
     scale *= 0.7;
     scale = Math.max(0.5, scale);
     updateTransform();
+    console.log('%c[ZOOM]', 'color: #9b59b6; font-weight: bold', `Button Zoom Out: ${oldScale.toFixed(2)} -> ${scale.toFixed(2)}`);
 }
 
 function resetZoom() {
@@ -710,6 +822,7 @@ function resetZoom() {
     translateX = 0;
     translateY = 0;
     updateTransform();
+    console.log('%c[ZOOM]', 'color: #9b59b6; font-weight: bold', 'Zoom reset to 1.0, Pan reset to (0, 0).');
 }
 
 function updateTransform() {
@@ -730,6 +843,8 @@ function getCanvasCoordinates(clientX, clientY) {
 
 function closeColorPicker() {
     colorPickerModal.style.display = 'none';
+    console.log('%c[UI]', 'color: #f39c12; font-weight: bold', 'Color picker closed. Pixel selection cleared.');
+    selectedPixel = null;
 }
 
 function applyColor() {
@@ -742,8 +857,11 @@ function applyColor() {
     
     if (!/^#[0-9A-Fa-f]{6}$/.test(color)) {
         showNotification('Invalid color!');
+        console.error('%c[INPUT ERROR]', 'color: #c0392b; font-weight: bold', 'Invalid color format submitted:', color);
         return;
     }
+    
+    logPixelInteraction('COLOR CHOSEN', selectedPixel.x, selectedPixel.y, color);
 
     if (!adWatchedAndReady) {
         selectedColorDuringAd = color;
@@ -758,39 +876,30 @@ function applyColor() {
 async function finalizePixelDraw(color) {
     if (!selectedPixel) return;
     
-    const pixelKey = `${selectedPixel.x}-${selectedPixel.y}`;
+    const x = selectedPixel.x;
+    const y = selectedPixel.y;
+    const pixelKey = `${x}-${y}`;
 
     try {
-        const response = await fetch(`${WORKER_URL}/pixel`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                x: selectedPixel.x,
-                y: selectedPixel.y,
-                color: color
-            })
-        });
-
-        const result = await response.json();
+        const result = await logFinalizePixelDraw(x, y, color, null);
 
         if (result.success) {
             pixelData[pixelKey] = color;
             coloredPixels++;
+            document.getElementById('statsText').textContent = `Pixels: ${coloredPixels} / ${totalPixels} | © 2025 Sliz®`;
 
             ctx.fillStyle = color;
             ctx.fillRect(
-                selectedPixel.x * PIXEL_SIZE,
-                selectedPixel.y * PIXEL_SIZE,
+                x * PIXEL_SIZE,
+                y * PIXEL_SIZE,
                 PIXEL_SIZE,
                 PIXEL_SIZE
             );
             showNotification('Pixel drawn successfully!');
         } else {
-            console.error('Server error saving pixel:', result.message);
             showNotification(result.message || 'Error saving pixel');
         }
     } catch (e) {
-        console.error('Network error saving pixel:', e);
         showNotification('Error connecting to server');
     }
 
@@ -799,6 +908,7 @@ async function finalizePixelDraw(color) {
     selectedColorDuringAd = null;
     hidePostAdElements();
     videoOverlay.style.display = 'none';
+    logPixelInteraction('CLEARED', x, y, 'Pixel finalization finished/cleared');
 }
 
 function updateTimer(duration) {
@@ -824,6 +934,8 @@ function showVideo() {
     adVideo.currentTime = 0;
     adVideo.muted = true;
     let videoDuration = 0;
+    
+    console.log('%c[AD]', 'color: #c0392b; font-weight: bold', 'Displaying ad video. Ready state:', adWatchedAndReady);
 
     const markAdAsReady = () => {
         if (!adWatchedAndReady) {
@@ -834,6 +946,7 @@ function showVideo() {
             closeVideoBtn.style.display = 'flex';
             photoContainer.style.display = 'flex';
             videoContainer.style.display = 'none';
+            console.log('%c[AD]', 'color: #27ae60; font-weight: bold', 'Ad completed. Pixel draw unlocked.');
         }
     };
     
@@ -847,6 +960,7 @@ function showVideo() {
                     markAdAsReady();
                 }
             }, 100);
+            console.log('%c[AD]', 'color: #c0392b; font-weight: bold', `Ad duration: ${videoDuration.toFixed(2)}s. Timer started.`);
         }
     };
     
@@ -856,19 +970,19 @@ function showVideo() {
         if (playPromise !== undefined) {
             playPromise
                 .then(() => {
-                    console.log('Video playing successfully.');
+                    console.log('%c[AD]', 'color: #2ecc71; font-weight: bold', 'Video playing successfully (Autoplay/Manual).');
                     videoOverlay.onclick = null;
                     setupTimer();
                 })
                 .catch(error => {
-                    console.warn('Autoplay blocked/interrupted. User interaction required.');
+                    console.warn('%c[AD]', 'color: #f39c12; font-weight: bold', 'Autoplay blocked. User click required.');
                     showNotification('Click the black area to start the ad.');
                     
                     videoOverlay.onclick = () => {
                         adVideo.play().then(() => {
                             videoOverlay.onclick = null;
                             setupTimer();
-                        }).catch(e => console.error('Play failed after manual click:', e));
+                        }).catch(e => console.error('%c[AD ERROR]', 'color: #e74c3c; font-weight: bold', 'Play failed after manual click:', e));
                     };
                 });
         }
@@ -882,7 +996,7 @@ function showVideo() {
             adVideo.removeEventListener('timeupdate', progressCheck);
             if(progressCheckTimer) clearTimeout(progressCheckTimer);
             setupTimer();
-            console.log('Initial playback confirmed. Waiting for full ad completion.');
+            console.log('%c[AD]', 'color: #34495e; font-weight: bold', 'Initial playback confirmed. Waiting for full ad completion.');
             
             return;
         }
@@ -895,6 +1009,7 @@ function showVideo() {
         if (adVideo.currentTime < 1) {
              markAdAsReady();
              showNotification('Video is stuck. You may close the ad.');
+             console.warn('%c[AD WARNING]', 'color: #e67e22; font-weight: bold', 'Video stuck detected, allowing early close.');
         }
     }, 5000);
 
@@ -921,6 +1036,8 @@ function setupVideoEvents() {
         videoOverlay.style.display = 'none';
         hidePostAdElements();
         videoOverlay.onclick = null;
+        
+        console.log('%c[AD CLOSE]', 'color: #c0392b; font-weight: bold', `Ad closed. Watched and Ready: ${adWatchedAndReady}. Color to draw: ${!!colorToDraw}`);
 
         if (selectedPixel && adWatchedAndReady && colorToDraw) {
             finalizePixelDraw(colorToDraw);
