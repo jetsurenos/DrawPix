@@ -254,12 +254,16 @@
         position: relative;
         width: 100%;
         height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 
     .video-container video {
         width: 100%;
         height: 100%;
         object-fit: contain;
+        display: block;
     }
 
     #timerContainer {
@@ -270,7 +274,7 @@
         height: 40px;
         z-index: 2001;
         cursor: default;
-        display: flex;
+        display: none;
         align-items: center;
         justify-content: center;
     }
@@ -313,21 +317,21 @@
     
     #photoContainer {
         position: absolute;
-        top: 20px;
-        right: 20px;
-        width: 40px;
-        height: 40px;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
         z-index: 2001;
         display: none;
-        border-radius: 50%;
-        overflow: hidden;
-        box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        background: black;
+        justify-content: center;
+        align-items: center;
     }
 
     #photoContainer img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
     }
 
     .notification {
@@ -410,6 +414,16 @@
     </div>
 
 <div class="video-overlay" id="videoOverlay">
+    <div id="photoContainer">
+        <img src="Assets/photo.png" alt="AD - E1 Photo">
+    </div>
+    
+    <div class="video-container">
+        <video id="adVideo" preload="auto">
+            <source src="Assets/origin.mp4" type="video/mp4">
+        </video>
+    </div>
+
     <div id="timerContainer">
         <svg width="40" height="40" viewBox="0 0 40 40">
             <circle cx="20" cy="20" r="18" fill="rgba(0,0,0,0.5)" />
@@ -417,15 +431,8 @@
         </svg>
         <span id="timerText"></span>
     </div>
+
     <button class="close-button" id="closeVideo">✕</button>
-    <div id="photoContainer">
-        <img src="Assets/photo.png" alt="AD - E1 Photo">
-    </div>
-    <div class="video-container">
-        <video id="adVideo" preload="auto">
-            <source src="Assets/origin.mp4" type="video/mp4">
-        </video>
-    </div>
 </div>
 
     <div class="notification" id="notification"></div>
@@ -449,6 +456,7 @@ const timerContainer = document.getElementById('timerContainer');
 const timerCircle = timerContainer.querySelector('.timer-circle');
 const timerText = document.getElementById('timerText');
 const photoContainer = document.getElementById('photoContainer');
+const videoContainer = document.querySelector('.video-container');
 
 const colors = [
     '#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF', '#FFA500', '#800080',
@@ -790,6 +798,7 @@ async function finalizePixelDraw(color) {
     adWatchedAndReady = false;
     selectedColorDuringAd = null;
     hidePostAdElements();
+    videoOverlay.style.display = 'none';
 }
 
 function updateTimer(duration) {
@@ -811,6 +820,7 @@ function showVideo() {
     timerContainer.style.display = 'flex';
     closeVideoBtn.style.display = 'none';
     photoContainer.style.display = 'none';
+    videoContainer.style.display = 'flex';
     adVideo.currentTime = 0;
     adVideo.muted = true;
     let videoDuration = 0;
@@ -822,7 +832,8 @@ function showVideo() {
             clearInterval(updateTimerInterval);
             timerContainer.style.display = 'none';
             closeVideoBtn.style.display = 'flex';
-            photoContainer.style.display = 'block';
+            photoContainer.style.display = 'flex';
+            videoContainer.style.display = 'none';
         }
     };
     
@@ -897,6 +908,7 @@ function hidePostAdElements() {
     closeVideoBtn.style.display = 'none';
     photoContainer.style.display = 'none';
     timerContainer.style.display = 'none';
+    videoContainer.style.display = 'flex';
     clearInterval(updateTimerInterval);
 }
 
