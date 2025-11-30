@@ -23,6 +23,8 @@ If you encounter an error, security issue, or anything that isn't working as exp
 
 Providing this information helps us determine if the problem is on the server side or a client-side issue, and we will guide you on the necessary steps to resolve it. Experienced developers are encouraged to provide additional details from the Network or Security tabs in DevTools for a deeper analysis of server or security-related problems.
 
+And also if you get an error and it turns out that it is, for example, Error Connection to Server or something else on your client side, try going to [HELP.md](https://github.com/SlizR/DrawPix/blob/main/HELP.md) where it is described why this is and how to solve it
+
 ## ✨ Suggest a Feature
 
 If you have an idea for an improvement or a quality-of-life change that you think would enhance DrawPix:
