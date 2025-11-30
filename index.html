@@ -613,19 +613,19 @@ async function loadPixelData() {
 }
 
 async function updatePixels() {
+    pixelData = {};
     try {
         const result = await logLoadPixelData(null);
         pixelData = result.data;
         coloredPixels = Object.keys(pixelData).length;
         drawCanvas();
-        document.getElementById('statsText').textContent = `Pixels: ${coloredPixels} / ${totalPixels} | © 2025 Sliz®`;
     } catch (e) {
         showNotification('Error updating pixels');
         console.error(e);
     }
 }
 
-setInterval(updatePixels, 10000);
+setInterval(updatePixels, 20000);
 
 function setupCanvas() {
     ctx.fillStyle = '#f5f5f5';
@@ -647,6 +647,25 @@ function setupCanvas() {
 }
 
 function drawCanvas() {
+    ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+
+    ctx.fillStyle = '#f5f5f5';
+    ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+
+    ctx.strokeStyle = '#e0e0e0';
+    ctx.lineWidth = 0.5;
+    for (let i = 0; i <= GRID_SIZE; i++) {
+        ctx.beginPath();
+        ctx.moveTo(i * PIXEL_SIZE, 0);
+        ctx.lineTo(i * PIXEL_SIZE, CANVAS_SIZE);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(0, i * PIXEL_SIZE);
+        ctx.lineTo(CANVAS_SIZE, i * PIXEL_SIZE);
+        ctx.stroke();
+    }
+
     let count = 0;
     for (const key in pixelData) {
         const [x, y] = key.split('-').map(Number);
@@ -654,6 +673,7 @@ function drawCanvas() {
         ctx.fillRect(x * PIXEL_SIZE, y * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE);
         count++;
     }
+
     console.log('%c[RENDER]', 'color: #2980b9; font-weight: bold', `Canvas redrawn with ${count} colored pixels.`);
 }
 
